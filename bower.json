@@ -1,0 +1,12 @@
+{
+  "name": "myzoombox",
+  "private": true,
+  "dependencies": {
+    "modernizr": "~2.6.2",
+    "jquery": "~1.10.2"
+  },
+  "devDependencies": {
+    "bourbon": "~3.1.8",
+    "neat": "~1.5.0"
+  }
+}
