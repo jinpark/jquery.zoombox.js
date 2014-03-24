@@ -2,3 +2,88 @@
 @import "bourbon/app/assets/stylesheets/bourbon";
 @import "neat/app/assets/stylesheets/neat";
 
+
+$max-width: em(1200);
+
+
+.wrapper {
+	@include outer-container;
+}
+
+ul {
+	margin: 0;
+	padding: 0;  
+	li {
+		list-style: none;
+	}
+}
+
+img {
+	display: block; 
+	width: 100%;
+	max-width: 100%; 
+}
+
+.gallery {
+	padding: 0 20%;
+	@include clearfix;
+	li {
+		width: 33.333%;
+		float: left;
+		padding: 10px;
+		@include box-sizing(border-box);
+	}
+}
+
+.copy {
+	max-width: 50%;
+	margin-left: auto;
+	margin-right: auto; 
+}
+
+/* ========
+zoombox
+======== */  
+
+#zb-container {
+	position: fixed;
+	z-index: 9000;
+	background: rgba(0,0,0,.6);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,.6);
+	display: none;
+	
+	.zb-target {
+		position: absolute;
+		.inner {
+			position: relative;
+		}
+		.zb-close {
+			position: absolute;
+			top: -20px;
+			right: -20px;
+			color: #fff;
+			cursor: pointer;
+		}
+	}
+
+	.zb-overlay {
+		position: fixed;
+		z-index: 9000;
+		background: rgba(0,0,0,.6);
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		text-align: center;
+		display: none;
+	}
+}
+
+
+
+
+
