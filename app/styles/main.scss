@@ -80,6 +80,40 @@ zoombox
 	}
 }
 
+#akabox {
+	position: fixed;
+	z-index: 9000;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	
+	.akabox-target {
+		position: absolute;
+		z-index: 9002;  
+		.akabox-inner {
+			position: relative;
+		}
+		.akabox-close {
+			position: absolute;
+			top: -20px;
+			right: -20px;
+			color: #fff;
+			cursor: pointer;
+		}
+	}
+
+	.akabox-overlay {
+		position: fixed;
+		z-index: 9001;
+		background: rgba(0,0,0,.6);
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+}
 
 
 
