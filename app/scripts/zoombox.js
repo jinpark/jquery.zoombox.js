@@ -2,80 +2,95 @@
     
     'use strict';
 
-    $.fn.zoombox = function( options ) {
+    $.fn.akabox = function(options) {
         
         var config = $.extend({
-            // These are the defaults.
             debug : true,
-            videoSrc : null,
             top: '10%',
             left:  0,
             width: '60%',
             marginLeft: '20%',
+            fadeInSpeed : 200,
+            zoomInSpeed : 250,
+            fadeOutSpeed : 200,
+            zoomOutSpeed : 250,
+            autoplay     : true,
             onOpenedCallback : function(){},
             onClosedCallback : function(){}
         }, options);
 
-        var _box = null,
-            _overlay = null,
-            _content = null,
-            _target = null,
-            _img = null,
-            _imgSrc = null,
-            _imgW = null,
-            _imgH = null,
-            _imgL = null,
-            _imgT = null,
+        var $box = null,
+            $target = null,
+            $overlay = null,
+            $thumbWrap = null,
+            $btnClose = null,
+            _thumb = null,
+            _thumbSrc = null,
+            _thumbW = null,
+            _thumbH = null,
+            _thumbL = null,
+            _thumbT = null,
+
+            $videoWrap = null,
+            $video = null,
+            _videoSrc = null,
             _scrollTop = null;
 
 
         // Insert a box to DOM
-        function injectTheBox () {
+        function initBox () {
             /*jshint multistr: true */
-            var boxHtml = '<div id="zb-container">\
-                            <div class="zb-target">\
-                                <div class="inner">\
-                                    <span class="zb-close">close</span>\
-                                    <div class="zb-content"></div>\
+            var boxHtml = '<div id="akabox">\
+                            <div class="akabox-target">\
+                                <div class="akabox-inner">\
+                                    <span class="akabox-close">close</span>\
+                                    <div class="akabox-thumb"></div>\
+                                    <div class="akabox-video"></div>\
                                 </div>\
                             </div>\
-                            <div class="zb-overlay"></div>\
+                            <div class="akabox-overlay"></div>\
                         </div>';
 
             $(boxHtml).appendTo($('body'));
 
-            _box = $('#zb-container');
-            _overlay = _box.find('.zb-overlay');
-            _content = _box.find('.zb-content');
-            _target = _box.find('.zb-target');
-            
-            _box.hide();
-            _overlay.on('click',function(){
+            $box = $('#akabox');
+            $overlay = $box.find('.akabox-overlay');
+            $target = $box.find('.akabox-target');
+            $thumbWrap = $box.find('.akabox-thumb');
+            $videoWrap = $box.find('.akabox-video');
+            $btnClose = $box.find('.akabox-close');
+
+            $box.hide();
+
+            $overlay.on('click',function(){
+                closeBox();
+            });
+            $btnClose.on('click',function(){
                 closeBox();
             });
         }
 
-        function init(ele) {
+        function initImages(ele) {
 
-            _content.empty();
-            _target.attr('style','');
+            $thumbWrap.empty();
+            $target.attr('style','');
 
             ele.on('click', function(e){
                 e.preventDefault();
-                _img = $(this);
-                getEleSt(_img);
-                zoomInBox(_img);
+                _thumb = $(this);
+                getEleSt(_thumb);
+                zoomInBox(_thumb);
             });
 
             $(window).scroll(function(){
-                if(_img){
-                    getEleSt(_img);
+                if(_thumb){
+                    getEleSt(_thumb);
                 }
             });
 
             $(window).resize(function(){
-                if(_img){
-                    getEleSt(_img);
+                if(_thumb){
+                    getEleSt(_thumb);
                 }
             });
         }
@@ -84,31 +99,37 @@
 
             var self = ele;
 
-            _imgSrc = self.attr('src');
-            _imgW   = self.width();
-            _imgH   = self.height();
-            _imgL   = self.offset().left;
-            _imgT   = self.offset().top;
+            _thumbSrc = self.attr('src');
+            _thumbW   = self.width();
+            _thumbH   = self.height();
+            _thumbL   = self.offset().left;
+            _thumbT   = self.offset().top;
             _scrollTop = $(window).scrollTop();
         }
 
         function zoomInBox(ele) {
 
-            _content.html('<img src="'+ _imgSrc +'" />');
+            $thumbWrap.html('<img src="'+ _thumbSrc +'" />');
 
-            _target.css('width', _imgW)
-                    .css('height', _imgH)
-                    .css('left', _imgL)
-                    .css('top', _imgT - _scrollTop);
+            $target.css('width', _thumbW)
+                    .css('height', _thumbH)
+                    .css('left', _thumbL)
+                    .css('top', _thumbT - _scrollTop);
 
-            _box.fadeIn( 200, function() {
-                _target.transition({
+
+            $box.fadeIn( config.fadeInSpeed, function() {
+                $target.transition({
                     top: config.top,
                     left: config.left,
                     width: config.width,
                     height: 'auto',
                     marginLeft: config.marginLeft
-                }, 250, function(){
+                }, config.zoomInSpeed, function(){
+
+                    if( ele.data('youtube') ){
+                        fetchYoutubeVideo(ele.data('youtube'));
+                    }
+
                     config.onOpenedCallback();
                 });
             });
@@ -116,181 +137,54 @@
 
         function closeBox () {
             
-            _target.transition({
-                top: _imgT - _scrollTop,
-                left: _imgL,
-                width: _imgW,
-                height: _imgH,
+            
+            $thumbWrap.find('img').css('opacity','1');
+            $videoWrap.hide();
+
+            $target.transition({
+                top: _thumbT - _scrollTop,
+                left: _thumbL,
+                width: _thumbW,
+                height: _thumbH,
                 marginLeft : 0
 
-            }, 250, function(){
+            }, config.fadeOutSpeed, function(){
 
-                _box.fadeOut(250, function(){
-                    _content.empty();
-                    _target.attr('style','');
+                $box.fadeOut( config.zoomOutSpeed, function(){
+                    $thumbWrap.empty();
+                    $videoWrap.empty();
+                    $target.attr('style','');
                     config.onClosedCallback();
                 });
             });
         }
 
-        // initialize every element
-        injectTheBox();
+        function fetchYoutubeVideo(src) {
+            $videoWrap.hide();
+
+            var autoplay = 1,
+                html     = '';
+            
+            if(!config.autoplay){
+                autoplay = 0;
+            }
+
+            html = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/'+src+'?rel=0&autoplay='+autoplay+'" frameborder="0" allowfullscreen></iframe>';
+            
+            setTimeout(function(){
+                $videoWrap.append(html).show();
+                $thumbWrap.find('img').css('opacity','0');                
+            }, 500);
+        }
+
+                
+        initBox();
         
         this.filter('img').each(function() {
-            init($(this));
+            initImages($(this));
         });
 
         return this;
     };
  
 }( jQuery, window, document));
-
-
-(function($, window, document) {
-
-    var Akabox = {
-
-        init: function(options, ele){
-
-            var base = this,
-                $ele  = $(ele);
-
-            base.$box     = $('#akabox');
-            base.$overlay = base.$box.find('.akabox-overlay');
-            base.$target  = base.$box.find('.akabox-target');
-            base.$image   = base.$box.find('.akabox-image');
-            base.$video   = base.$box.find('.akabox-video');
-
-            $ele.on('click', function(evt){
-                evt.preventDefault();
-                base.onClicked(options, $(this));
-            });
-        },
-
-        userActions : function() {
-            var base = this;
-
-            base.$box.find('.akabox-close').on('click', function(){
-                base.zoomOut(options);
-            });
-        },
-
-        getEleSt : function (ele) {
-
-            var base = this;
-
-            base._imgSrc   = ele.attr('src');
-            base._videoSrc = ele.data('video');
-            base._eleW     = ele.width();
-            base._eleH     = ele.height();
-            base._eleT     = ele.offset().top;
-            base._eleL     = ele.offset().left;
-            base._scrollTop = $(window).scrollTop();
-        },
-
-        onClicked : function(options, ele) {
-
-            var base = this;
-
-            base.getEleSt(ele);
-            base.zoomIn(options, ele);
-        },
-
-        zoomIn : function(options) {
-            
-            var base = this;
-
-            base.$image.html('<img src="'+ base._imgSrc +'" />');
-
-            base.$target.css('width', base._eleW)
-                        .css('height', base._eleH)
-                        .css('left', base._eleL)
-                        .css('top', base._eleT - base._scrollTop);
-
-            base.$box.fadeIn( options.fadeInSpeed, function() {
-                base.$target.transition({
-                    top: options.top,
-                    left: options.left,
-                    width: options.width,
-                    height: 'auto',
-                    marginLeft: options.marginLeft
-                }, options.zoomInSpeed , function(){
-                    options.onOpened();
-                });
-            });
-
-        },
-
-        zoomOut : function(options) {
-            var base = this;
-
-            console.log(base);
-            base.$target.transition({
-                marginLeft: 0,
-                top: base._eleT - base._scrollTop,
-                left: base._eleL,
-                width: base._eleW,
-                height: base._eleH
-
-            }, 250, function(){
-
-                base.$box.fadeOut(250, function(){
-                    base.$image.empty();
-                    base.$target.attr('style','');
-                    options.onClosed();
-                });
-            });
-        }
-
-    };
-
-    $.fn.akabox = function (options) {
-
-         var config = $.extend({
-            // These are the defaults.
-            debug : true,
-            videoSrc : null,
-            top: '10%',
-            left:  0,
-            width: '60%',
-            marginLeft: '20%',
-            fadeInSpeed : 200,
-            zoomInSpeed : 250,
-            zoomOutSpeend : 250,
-            onOpened : function(){},
-            onClosed : function(){}
-
-        }, options);
-
-
-        /*jshint multistr: true */
-        var html =   '<div id="akabox">\
-                            <div class="akabox-target">\
-                                <div class="akabox-inner">\
-                                    <span class="akabox-close">close</span>\
-                                    <div class="akabox-image"></div>\
-                                    <div class="akabox-video" id="akamai-media-player"></div>\
-                                </div>\
-                            </div>\
-                            <div class="akabox-overlay"></div>\
-                        </div>';
-
-        $(html).appendTo($('body'));
-
-        return this.filter('img').each(function() {
-
-            if( $(this).data("akabox-init") === true) {
-                return false;
-            }
-            
-            $(this).data("akabox-init", true);
-
-            var akabox = Object.create(Akabox);
-
-            akabox.init(config, this);
-        });
-    };
-
-
-}(jQuery, window, document));
-

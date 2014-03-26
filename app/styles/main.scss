@@ -44,7 +44,7 @@ img {
 /* ========
 zoombox
 ======== */  
-
+/*
 #zb-container {
 	position: fixed;
 	z-index: 9000;
@@ -79,7 +79,7 @@ zoombox
 		bottom: 0;
 	}
 }
-
+*/
 #akabox {
 	position: fixed;
 	z-index: 9000;
@@ -101,6 +101,14 @@ zoombox
 			right: -20px;
 			color: #fff;
 			cursor: pointer;
+		}
+		.akabox-video {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #000;
 		}
 	}
 
