@@ -96,7 +96,7 @@
         }
 
         function getEleSt(ele) {
-
+            
             var self = ele;
 
             _thumbSrc = self.attr('src');
