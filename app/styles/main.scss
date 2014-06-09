@@ -44,7 +44,17 @@ img {
 /* ========
 akabox style
 ======== */  
-#akabox {
+
+.zoombox {
+	position: relative;
+	.zoombox-button {
+		position: absolute;
+		top: 50%;
+		left: 40%;	
+	}
+}
+
+#zoombox-modal {
 	position: fixed;
 	z-index: 9000;
 	top: 0;
@@ -53,20 +63,21 @@ akabox style
 	bottom: 0;
 	display: none;
 	
-	.akabox-target {
+	.zoombox-target {
 		position: absolute;
-		z-index: 9002;  
-		.akabox-inner {
+		z-index: 9002;
+		background-color: #ccc;
+		.zoombox-inner {
 			position: relative;
 		}
-		.akabox-close {
+		.zoombox-close {
 			position: absolute;
 			top: -20px;
 			right: -20px;
 			color: #fff;
 			cursor: pointer;
 		}
-		.akabox-video {
+		.zoombox-video {
 			width: 100%;
 			height: 100%;
 			position: absolute;
@@ -76,7 +87,7 @@ akabox style
 		}
 	}
 
-	.akabox-overlay {
+	.zoombox-overlay {
 		position: fixed;
 		z-index: 9001;
 		background: rgba(0,0,0,.6);

@@ -1,7 +1,15 @@
 console.log('\'Allo \'Allo!');
 
 $(document).ready(function(){
-	$('.akabox').akabox();
+	$('.zoombox').zoombox({
+		debug : false,
+		onOpenedCallback : function(){
+			console.log('opened');
+		},
+		onClosedCallback : function(){
+			console.log('closed');
+		}
+	});
 });
 
 
