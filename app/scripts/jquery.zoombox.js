@@ -145,7 +145,7 @@
                                 <div class="zoombox-inner">\
                                     <span class="zoombox-close">close</span>\
                                     <div class="zoombox-thumb"></div>\
-                                    <div class="zoombox-video"></div>\
+                                    <div id="akamai-media-player" class="zoombox-video"></div>\
                                 </div>\
                             </div>\
                             <div class="zoombox-overlay"></div>\
