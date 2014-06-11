@@ -19,7 +19,9 @@
             fadeOutSpeed : 250,
             zoomOutSpeed : 500,
             autoplay     : true,
+            // beforeOpen : function(){},
             onOpenedCallback : function(){},
+            // beforeClose : function(){},
             onClosedCallback : function(){}
         };
 
@@ -46,6 +48,7 @@
         });
 
         $(window).resize(function(){
+            // DOTO: Debounced Resize()
             base.keepStatus(base.element);
         });
     };
@@ -62,9 +65,24 @@
         this._eleL      = $ele.offset().left;
         this._scrollTop = $(window).scrollTop();
 
+        if( this._posterSrc ) {
+            this.setPoster();
+        }
+
         if(this.options.debug && window.console) {
             console.log(this);
         }
+    };
+
+    Zoombox.prototype.setPoster = function() {
+        var $box = this.box.self;
+        $box.find('.zoombox-thumb').html('<img id="zoombox-poster" src="'+this._posterSrc+'" />');
+
+        var image = new Image();
+        image.src = this._posterSrc;
+        image.onload = function(){
+            console.log(this.width);
+        };
     };
 
     Zoombox.prototype.showBox = function() {
@@ -123,6 +141,9 @@
                         $box.removeClass('active');
                         
                         base.isAnimating = false;
+
+                        $box.find('.zoombox-thumb').html('');
+                        $box.find('.zoombox-video').html('');
 
                         base.options.onClosedCallback();
                     });
