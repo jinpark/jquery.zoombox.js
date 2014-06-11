@@ -3,8 +3,8 @@ console.log('\'Allo \'Allo!');
 $(document).ready(function(){
 	$('.zoombox').zoombox({
 		debug : false,
-		onOpenedCallback : function(){
-			console.log('opened');
+		onOpenedCallback : function(element){
+			console.log(element);
 		},
 		onClosedCallback : function(){
 			console.log('closed');

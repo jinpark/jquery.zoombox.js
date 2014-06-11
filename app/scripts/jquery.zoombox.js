@@ -20,9 +20,9 @@
             zoomOutSpeed : 500,
             autoplay     : true,
             // beforeOpen : function(){},
-            onOpenedCallback : function(){},
+            onOpened : function(element){},
             // beforeClose : function(){},
-            onClosedCallback : function(){}
+            onClosed : function(element){}
         };
 
     // The actual plugin constructor
@@ -57,7 +57,7 @@
         
         var $ele = $(ele);
 
-        this._posterSrc = $ele.data('poster');
+        this._thumbSrc = $ele.data('poster');
         this._videoSrc  = $ele.data('video');
         this._eleW      = $ele.width();
         this._eleH      = $ele.height();
@@ -65,8 +65,8 @@
         this._eleL      = $ele.offset().left;
         this._scrollTop = $(window).scrollTop();
 
-        if( this._posterSrc ) {
-            this.setPoster();
+        if( this._thumbSrc ) {
+            this.setThumbnail();
         }
 
         if(this.options.debug && window.console) {
@@ -74,15 +74,9 @@
         }
     };
 
-    Zoombox.prototype.setPoster = function() {
+    Zoombox.prototype.setThumbnail = function() {
         var $box = this.box.self;
-        $box.find('.zoombox-thumb').html('<img id="zoombox-poster" src="'+this._posterSrc+'" />');
-
-        var image = new Image();
-        image.src = this._posterSrc;
-        image.onload = function(){
-            console.log(this.width);
-        };
+        $box.find('.zoombox-thumb').html('<img src="'+this._thumbSrc+'" />');
     };
 
     Zoombox.prototype.showBox = function() {
@@ -115,7 +109,7 @@
                     
                     base.isAnimating = false;
 
-                    base.options.onOpenedCallback();
+                    base.options.onOpenedCallback(base.element);
                 });
             });
         }
@@ -145,7 +139,7 @@
                         $box.find('.zoombox-thumb').html('');
                         $box.find('.zoombox-video').html('');
 
-                        base.options.onClosedCallback();
+                        base.options.onClosedCallback(base.element);
                     });
                 });
             }
