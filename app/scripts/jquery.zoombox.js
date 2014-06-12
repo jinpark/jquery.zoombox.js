@@ -2,7 +2,12 @@
  * jQuery zoombox plugin
  * Original author: @ericsun977
  * Licensed under the MIT license
+ * Required libraries & plugins: 
+ *  jquery
+ *  jquery.easing 1.3+
+ *  jquery.transit 0.9.9+
  */
+
 
 ;(function ( $, window, document, undefined ) {
 
@@ -19,9 +24,10 @@
             fadeOutSpeed : 250,
             zoomOutSpeed : 500,
             autoplay     : true,
-            // beforeOpen : function(){},
+            onInit: function(){},
+            beforeOpen : function(element){},
             onOpened : function(element){},
-            // beforeClose : function(){},
+            beforeClose : function(element){},
             onClosed : function(element){}
         };
 
@@ -32,6 +38,7 @@
         this.options = $.extend( {}, defaults, options) ;
         this.isAnimating = false;
         this.box = box;
+        this.data = {};
         this.init();
     };
 
@@ -39,17 +46,22 @@
 
         var base = this;
 
+        if (!base.box.isInited) {
+            base.options.onInit();
+            base.box.isInited = true;
+        }
+
         $(base.element).find('.zoombox-button').on('click', function(e){
             e.preventDefault();
             base.keepStatus(base.element);
+
             if(!base.isAnimating) {
                 base.showBox();    
             }
         });
 
         $(window).resize(function(){
-            // DOTO: Debounced Resize()
-            base.keepStatus(base.element);
+            base.updateStatus(base.element);
         });
     };
     
@@ -57,26 +69,30 @@
         
         var $ele = $(ele);
 
-        this._thumbSrc = $ele.data('poster');
-        this._videoSrc  = $ele.data('video');
-        this._eleW      = $ele.width();
-        this._eleH      = $ele.height();
-        this._eleT      = $ele.offset().top;
-        this._eleL      = $ele.offset().left;
-        this._scrollTop = $(window).scrollTop();
-
-        if( this._thumbSrc ) {
-            this.setThumbnail();
-        }
+        this.data._eleW      = $ele.width();
+        this.data._eleH      = $ele.height();
+        this.data._eleT      = $ele.offset().top;
+        this.data._eleL      = $ele.offset().left;
+        this.data._scrollTop = $(window).scrollTop();
+        this.data._thumbSrc = $ele.data('poster');
+        this.data._videoSrc  = $ele.data('video');
 
         if(this.options.debug && window.console) {
-            console.log(this);
+            console.log(this.data);
         }
     };
 
-    Zoombox.prototype.setThumbnail = function() {
-        var $box = this.box.self;
-        $box.find('.zoombox-thumb').html('<img src="'+this._thumbSrc+'" />');
+    Zoombox.prototype.updateStatus = function(ele) {
+        var $ele = $(ele);
+        this.data._eleW      = $ele.width();
+        this.data._eleH      = $ele.height();
+        this.data._eleT      = $ele.offset().top;
+        this.data._eleL      = $ele.offset().left;
+        this.data._scrollTop = $(window).scrollTop();
+
+        if(this.options.debug && window.console) {
+            console.log(this.data);
+        }
     };
 
     Zoombox.prototype.showBox = function() {
@@ -85,16 +101,22 @@
             $box = this.box.self;
             $target = this.box.target;
 
+        if( base.data._thumbSrc ) {
+            $box.find('.zoombox-thumb').html('<img src="'+this.data._thumbSrc+'" />');
+        }
+
         $box.addClass('active');
 
-        $target.css('width', base._eleW)
-                .css('height', base._eleH)
-                .css('left', base._eleL)
-                .css('top', base._eleT - base._scrollTop);
+        $target.css('width', base.data._eleW)
+                .css('height', base.data._eleH)
+                .css('left', base.data._eleL)
+                .css('top', base.data._eleT - base.data._scrollTop);
  
         if (!base.isAnimating) {
             
             base.isAnimating = true;
+
+            base.options.beforeOpen(base.element);
 
             $box.fadeIn( base.options.fadeInSpeed, 'easeOutQuint', function() {
                 $target.transition({
@@ -109,7 +131,7 @@
                     
                     base.isAnimating = false;
 
-                    base.options.onOpenedCallback(base.element);
+                    base.options.onOpened(base.element);
                 });
             });
         }
@@ -123,23 +145,27 @@
 
                 base.isAnimating = true;
 
+                base.options.beforeClose(base.element);
+
                 $target.transition({
-                    top: base._eleT - $(window).scrollTop(),
-                    left: base._eleL,
-                    width: base._eleW,
-                    height: base._eleH,
+                    top: base.data._eleT - $(window).scrollTop(),
+                    left: base.data._eleL,
+                    width: base.data._eleW,
+                    height: base.data._eleH,
                     marginLeft: '0'
                 }, base.options.zoomOutSpeed, 'easeOutExpo', function(){
                     $box.fadeOut(base.options.fadeOutSpeed, 'easeOutQuint', function(){
                         
                         $box.removeClass('active');
-                        
+                        $target.attr('style','');
+                        base.data = {};
+
                         base.isAnimating = false;
 
                         $box.find('.zoombox-thumb').html('');
                         $box.find('.zoombox-video').html('');
 
-                        base.options.onClosedCallback(base.element);
+                        base.options.onClosed(base.element);
                     });
                 });
             }
@@ -150,9 +176,9 @@
 
         var Box = Box || {};
 
-        Box.injectBox = function () {
+        Box.isInited = false;
 
-            //$('#zoombox-modal').remove();
+        Box.injectBox = function () {
 
             /*jshint multistr: true */
             var boxHtml = '<div id="zoombox-modal">\

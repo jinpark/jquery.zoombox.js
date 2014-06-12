@@ -78,6 +78,7 @@ akabox style
 			position: relative;
 			width: 100%;
 			height: 100%;
+			background-color: #000;
 		}
 		.zoombox-close {
 			position: absolute;
@@ -94,8 +95,7 @@ akabox style
 			top: 0;
 			left: 0;
 			right: 0;
-			bottom: 0;  
-			background-color: #000;
+			bottom: 0;
 			opacity: 0;
 			@include transition(opacity 0.5s $ease-out-expo);
 		}
@@ -118,7 +118,8 @@ akabox style
 			opacity: 0.7;
 		}
 		.zoombox-target {
-			.zoombox-thumb {
+			.zoombox-thumb,
+			.zoombox-video {
 				opacity: 1;
 			}	
 		}

@@ -3,11 +3,20 @@ console.log('\'Allo \'Allo!');
 $(document).ready(function(){
 	$('.zoombox').zoombox({
 		debug : false,
-		onOpenedCallback : function(element){
-			console.log(element);
+		onInit: function(){
+			console.log('init');
 		},
-		onClosedCallback : function(){
-			console.log('closed');
+		beforeOpen: function(element){
+			console.log('beforeOpen');
+		},
+		onOpened : function(element){
+			console.log('onOpened');
+		},
+		beforeClose: function(element) {
+			console.log('beforeClose');
+		},
+		onClosed : function(element){
+			console.log('onClosed');
 		}
 	});
 });
