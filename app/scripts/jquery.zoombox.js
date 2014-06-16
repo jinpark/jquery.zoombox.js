@@ -2,7 +2,7 @@
  * jQuery zoombox plugin
  * Original author: @ericsun977
  * Licensed under the MIT license
- * Required libraries & plugins: 
+ * Required libraries & plugins:
  *  jquery
  *  jquery.easing 1.3+
  *  jquery.transit 0.9.9+
@@ -56,7 +56,7 @@
             base.keepStatus(base.element);
 
             if(!base.isAnimating) {
-                base.showBox();    
+                base.showBox();
             }
         });
 
@@ -64,9 +64,9 @@
             base.updateStatus(base.element);
         });
     };
-    
+
     Zoombox.prototype.keepStatus = function(ele) {
-        
+
         var $ele = $(ele);
 
         this.data._eleW      = $ele.width();
@@ -111,9 +111,9 @@
                 .css('height', base.data._eleH)
                 .css('left', base.data._eleL)
                 .css('top', base.data._eleT - base.data._scrollTop);
- 
+
         if (!base.isAnimating) {
-            
+
             base.isAnimating = true;
 
             base.options.beforeOpen(base.element);
@@ -126,16 +126,16 @@
                     height: base.options.height,
                     marginLeft: base.options.marginLeft
                 }, base.options.zoomInSpeed, 'easeOutExpo', function(){
-                    
+
                     $box.addClass('opened');
-                    
+
                     base.isAnimating = false;
 
                     base.options.onOpened(base.element);
                 });
             });
         }
-        
+
 
         $box.find('.zoombox-close, .zoombox-overlay').one('click', function(){
 
@@ -155,7 +155,7 @@
                     marginLeft: '0'
                 }, base.options.zoomOutSpeed, 'easeOutExpo', function(){
                     $box.fadeOut(base.options.fadeOutSpeed, 'easeOutQuint', function(){
-                        
+
                         $box.removeClass('active');
                         $target.attr('style','');
                         base.data = {};
@@ -163,7 +163,6 @@
                         base.isAnimating = false;
 
                         $box.find('.zoombox-thumb').html('');
-                        $box.find('.zoombox-video').html('');
 
                         base.options.onClosed(base.element);
                     });
@@ -206,7 +205,7 @@
 
         return this.each(function () {
             if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, 
+                $.data(this, 'plugin_' + pluginName,
                 new Zoombox( this, options, Box));
             }
         });
